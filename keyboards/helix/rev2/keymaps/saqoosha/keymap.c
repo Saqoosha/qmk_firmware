@@ -10,6 +10,7 @@
 #ifdef SSD1306OLED
   #include "ssd1306.h"
 #endif
+#include "rgblight.h"
 
 extern keymap_config_t keymap_config;
 
@@ -332,7 +333,31 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
   }
 }
 
+
+int LED_INDEX[] = {
+   5,  4,  3,  2,  1,  0, -1,
+   6,  7,  8,  9, 10, 11, -1,
+  17, 16, 15, 14, 13, 12, -1,
+  18, 19, 20, 21, 22, 23, 24,
+  31, 30, 29, 28, 27, 27, 25,
+};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+#ifdef CONSOLE_ENABLE
+    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
+#endif
+
+  int col = record->event.key.col;
+  int row = record->event.key.row;
+  if (record->event.pressed && ((is_master && row >= 5) || (!is_master && row < 5))) {
+    int i = LED_INDEX[(row % 5) * 7 + col];
+    led[i].r = 128;
+    led[i].g = 128;
+    led[i].b = 128;
+    rgblight_set();
+  }
+
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
@@ -474,6 +499,23 @@ void matrix_init_user(void) {
     #ifdef SSD1306OLED
         iota_gfx_init(!has_usb());   // turns on the display
     #endif
+}
+
+void keyboard_post_init_user(void) {
+//     debug_enable = true;
+//     debug_matrix = true;
+
+    for (int i = 0; i < RGBLED_NUM; i++) {
+        led[i].r = 0;
+        led[i].g = 0;
+        led[i].b = 0;
+    }
+    rgblight_set();
+
+//   rgblight_setrgb_at(255, 255, 255, 0);
+//   rgblight_setrgb_at(255, 0, 0, 1);
+//   rgblight_setrgb_at(0, 255, 0, 2);
+//   rgblight_setrgb_at(0, 0, 255, 3);
 }
 
 
