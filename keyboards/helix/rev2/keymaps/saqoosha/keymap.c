@@ -339,7 +339,7 @@ int LED_INDEX[] = {
    6,  7,  8,  9, 10, 11, -1,
   17, 16, 15, 14, 13, 12, -1,
   18, 19, 20, 21, 22, 23, 24,
-  31, 30, 29, 28, 27, 27, 25,
+  31, 30, 29, 28, 27, 26, 25,
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -352,9 +352,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   int row = record->event.key.row;
   if (record->event.pressed && ((is_master && row >= 5) || (!is_master && row < 5))) {
     int i = LED_INDEX[(row % 5) * 7 + col];
-    led[i].r = 128;
-    led[i].g = 128;
-    led[i].b = 128;
+    led[i].r = 255;
+    led[i].g = 255;
+    led[i].b = 255;
     rgblight_set();
   }
 
@@ -502,20 +502,22 @@ void matrix_init_user(void) {
 }
 
 void keyboard_post_init_user(void) {
-//     debug_enable = true;
-//     debug_matrix = true;
+//   for (int i = 0; i < RGBLED_NUM; i++) {
+//     led[i].r = 0;
+//     led[i].g = 0;
+//     led[i].b = 0;
+//   }
+//   rgblight_set();
+}
 
-    for (int i = 0; i < RGBLED_NUM; i++) {
-        led[i].r = 0;
-        led[i].g = 0;
-        led[i].b = 0;
-    }
-    rgblight_set();
 
-//   rgblight_setrgb_at(255, 255, 255, 0);
-//   rgblight_setrgb_at(255, 0, 0, 1);
-//   rgblight_setrgb_at(0, 255, 0, 2);
-//   rgblight_setrgb_at(0, 0, 255, 3);
+void led_update_user(void) {
+  for (int i = 0; i < RGBLED_NUM; i++) {
+    if (led[i].r > 0) led[i].r--;
+    if (led[i].g > 0) led[i].g--;
+    if (led[i].b > 0) led[i].b--;
+  }
+  rgblight_set();
 }
 
 
@@ -549,7 +551,8 @@ void music_scale_user(void)
 #ifdef SSD1306OLED
 
 void matrix_scan_user(void) {
-     iota_gfx_task();  // this is what updates the display continuously
+    led_update_user();
+    iota_gfx_task();  // this is what updates the display continuously
 }
 
 void matrix_update(struct CharacterMatrix *dest,
