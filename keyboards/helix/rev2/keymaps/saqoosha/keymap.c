@@ -342,19 +342,55 @@ int LED_INDEX[] = {
   31, 30, 29, 28, 27, 26, 25,
 };
 
-bool pressing[RGBLED_NUM];
+uint8_t white[RGBLED_NUM];
+
+typedef struct {
+  uint8_t col;
+  uint8_t row;
+  int8_t index;
+  uint64_t press_frame;
+  uint64_t release_frame;
+} keyevent;
+
+keyevent events[RGBLED_NUM];
+uint8_t next_event = 0;
+
+int8_t get_running_event_index(int8_t led_index) {
+  for (int i = 0; i < RGBLED_NUM; i++) {
+    int j = (next_event - 1 - i + RGBLED_NUM) % RGBLED_NUM;
+    if (events[j].index == led_index) {
+      return j;
+    }
+  }
+  return -1;
+}
+
+uint64_t current_frame = 0;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-
-#ifdef CONSOLE_ENABLE
-    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
-#endif
-
+// #ifdef CONSOLE_ENABLE
+//     uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
+// #endif
   int col = record->event.key.col;
   int row = record->event.key.row;
   if ((is_master && row >= 5) || (!is_master && row < 5)) {
-    int i = LED_INDEX[(row % 5) * 7 + col];
-    pressing[i] = record->event.pressed;
+    int index = LED_INDEX[(row % 5) * 7 + col];
+    int i = get_running_event_index(index);
+    if (record->event.pressed) {
+      if (i < 0) {
+        i = next_event;
+        next_event = (next_event + 1) % RGBLED_NUM;
+      }
+      events[i].col = col;
+      events[i].row = row % 5;
+      events[i].index = index;
+      events[i].press_frame = current_frame;
+      events[i].release_frame = 0;
+    } else {
+      if (i >= 0) {
+        events[i].release_frame = current_frame;
+      }
+    }
   }
 
   switch (keycode) {
@@ -501,28 +537,52 @@ void matrix_init_user(void) {
 }
 
 void keyboard_post_init_user(void) {
-//   for (int i = 0; i < RGBLED_NUM; i++) {
-//     led[i].r = 0;
-//     led[i].g = 0;
-//     led[i].b = 0;
-//   }
-//   rgblight_set();
+  for (int i = 0; i < RGBLED_NUM; i++) {
+    led[i].r = 0;
+    led[i].g = 0;
+    led[i].b = 0;
+  }
+  rgblight_set();
 }
 
 
-void led_update_user(void) {
+static void led_update_user(void) {
+  memset(white, 0, sizeof(white));
   for (int i = 0; i < RGBLED_NUM; i++) {
-    if (pressing[i]) {
-      led[i].r = 255;
-      led[i].b = 255;
-      led[i].g = 255;
-    } else {
-      if (led[i].r > 0) led[i].r--;
-      if (led[i].g > 0) led[i].g--;
-      if (led[i].b > 0) led[i].b--;
+    keyevent *e = &events[(next_event + 1 + i) % RGBLED_NUM];
+    if (e->index > 0) {
+      // uprintf("%d, %d, %lu, %lu\n", i, e->index, e->press_frame, e->release_frame);
+      if (e->release_frame == 0) { // pressing
+        for (int row = 0; row < 5; row++) {
+          int i = LED_INDEX[row * 7 + e->col];
+          if (i >= 0) {
+            white[i] = 64;
+          }
+        }
+      } else { // released
+        int d = current_frame - e->release_frame;
+        for (int row = 0; row < 5; row++) {
+          int i = LED_INDEX[row * 7 + e->col];
+          if (i >= 0) {
+            white[i] = MAX(white[i], MAX(0, 64 - d / 2));
+          }
+        }
+        if (current_frame > e->release_frame + 64 * 2) {
+            e->index = 0;
+        }
+      }
     }
   }
+
+  for (int i = 0; i < RGBLED_NUM; i++) {
+    led[i].r = white[i];
+    led[i].g = white[i];
+    led[i].b = white[i];
+  }
   rgblight_set();
+
+  current_frame++;
+  // uprintf("%lu\n", current_frame);
 }
 
 
