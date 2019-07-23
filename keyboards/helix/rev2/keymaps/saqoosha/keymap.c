@@ -342,6 +342,8 @@ int LED_INDEX[] = {
   31, 30, 29, 28, 27, 26, 25,
 };
 
+bool pressing[RGBLED_NUM];
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 #ifdef CONSOLE_ENABLE
@@ -350,12 +352,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   int col = record->event.key.col;
   int row = record->event.key.row;
-  if (record->event.pressed && ((is_master && row >= 5) || (!is_master && row < 5))) {
+  if ((is_master && row >= 5) || (!is_master && row < 5)) {
     int i = LED_INDEX[(row % 5) * 7 + col];
-    led[i].r = 255;
-    led[i].g = 255;
-    led[i].b = 255;
-    rgblight_set();
+    pressing[i] = record->event.pressed;
   }
 
   switch (keycode) {
@@ -513,9 +512,15 @@ void keyboard_post_init_user(void) {
 
 void led_update_user(void) {
   for (int i = 0; i < RGBLED_NUM; i++) {
-    if (led[i].r > 0) led[i].r--;
-    if (led[i].g > 0) led[i].g--;
-    if (led[i].b > 0) led[i].b--;
+    if (pressing[i]) {
+      led[i].r = 255;
+      led[i].b = 255;
+      led[i].g = 255;
+    } else {
+      if (led[i].r > 0) led[i].r--;
+      if (led[i].g > 0) led[i].g--;
+      if (led[i].b > 0) led[i].b--;
+    }
   }
   rgblight_set();
 }
