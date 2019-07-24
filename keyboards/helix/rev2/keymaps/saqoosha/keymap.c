@@ -553,6 +553,7 @@ void keyboard_post_init_user(void) {
 
 
 #define DELAY (10)
+#define MAX_BRIGHTNESS (128)
 
 static void led_update_user(void) {
   memset(white, 0, sizeof(white));
@@ -566,14 +567,14 @@ static void led_update_user(void) {
           int i = LED_INDEX[row * 7 + e->col];
           int dist = abs(row - e->row);
           if (i >= 0 && t - dist * DELAY > 0) {
-            white[i] = 255;
+            white[i] = MAX_BRIGHTNESS;
           }
         }
         for (int col = 0; col < 7; col++) {
           int i = LED_INDEX[e->row * 7 + col];
           int dist = abs(col - e->col);
           if (i >= 0 && t - dist * DELAY > 0) {
-            white[i] = 255;
+            white[i] = MAX_BRIGHTNESS;
           }
         }
       } else { // released
@@ -583,7 +584,7 @@ static void led_update_user(void) {
           int dist = abs(row - e->row);
           int tt = t - dist * DELAY;
           if (i >= 0) {
-            white[i] = MAX(white[i], MAX(0, MIN(255, 255 - tt * 8)));
+            white[i] = MAX(white[i], MAX(0, MIN(MAX_BRIGHTNESS, MAX_BRIGHTNESS - tt * 8)));
           }
         }
         for (int col = 0; col < 7; col++) {
@@ -591,10 +592,10 @@ static void led_update_user(void) {
           int dist = abs(col - e->col);
           int tt = t - dist * DELAY;
           if (i >= 0) {
-            white[i] = MAX(white[i], MAX(0, MIN(255, 255 - tt * 8)));
+            white[i] = MAX(white[i], MAX(0, MIN(MAX_BRIGHTNESS, MAX_BRIGHTNESS - tt * 8)));
           }
         }
-        if (current_frame > e->release_frame + 255 / 8 + DELAY * 7) {
+        if (current_frame > e->release_frame + MAX_BRIGHTNESS / 8 + DELAY * 7) {
             INVALIDATE_EVENT(e);
         }
       }
