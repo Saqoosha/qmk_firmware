@@ -568,11 +568,26 @@ static void led_update_user(void) {
             white[i] = 255;
           }
         }
+        for (int col = 0; col < 7; col++) {
+          int i = LED_INDEX[e->row * 7 + col];
+          int dist = abs(col - e->col);
+          if (i >= 0 && t - dist * DELAY > 0) {
+            white[i] = 255;
+          }
+        }
       } else { // released
         int t = current_frame - e->release_frame;
         for (int row = 0; row < 5; row++) {
           int i = LED_INDEX[row * 7 + e->col];
           int dist = abs(row - e->row);
+          int tt = t - dist * DELAY;
+          if (i >= 0) {
+            white[i] = MAX(white[i], MAX(0, MIN(255, 255 - tt * 8)));
+          }
+        }
+        for (int col = 0; col < 7; col++) {
+          int i = LED_INDEX[e->row * 7 + col];
+          int dist = abs(col - e->col);
           int tt = t - dist * DELAY;
           if (i >= 0) {
             white[i] = MAX(white[i], MAX(0, MIN(255, 255 - tt * 8)));
