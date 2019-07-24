@@ -11,6 +11,7 @@
   #include "ssd1306.h"
 #endif
 #include "rgblight.h"
+#include "led_tables.h"
 
 extern keymap_config_t keymap_config;
 
@@ -601,14 +602,14 @@ static void led_update_user(void) {
   }
 
   for (int i = 0; i < RGBLED_NUM; i++) {
-    led[i].r = white[i];
-    led[i].g = white[i];
-    led[i].b = white[i];
+    uint8_t b = pgm_read_byte(&CIE1931_CURVE[white[i]]);
+    led[i].r = b;
+    led[i].g = b;
+    led[i].b = b;
   }
   rgblight_set();
 
   current_frame++;
-  // uprintf("%lu\n", current_frame);
 }
 
 
