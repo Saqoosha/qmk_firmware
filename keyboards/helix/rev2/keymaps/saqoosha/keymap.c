@@ -344,6 +344,9 @@ int LED_INDEX[] = {
 
 uint8_t white[RGBLED_NUM];
 
+#define VALID_EVENT(x) (x->index >= 0)
+#define INVALIDATE_EVENT(x) (x->index = -1)
+
 typedef struct {
   uint8_t col;
   uint8_t row;
@@ -541,6 +544,8 @@ void keyboard_post_init_user(void) {
     led[i].r = 0;
     led[i].g = 0;
     led[i].b = 0;
+
+    events[i].index = -1;
   }
   rgblight_set();
 }
@@ -552,7 +557,7 @@ static void led_update_user(void) {
   memset(white, 0, sizeof(white));
   for (int i = 0; i < RGBLED_NUM; i++) {
     keyevent *e = &events[(next_event + 1 + i) % RGBLED_NUM];
-    if (e->index > 0) {
+    if (VALID_EVENT(e)) {
       // uprintf("%d, %d, %lu, %lu\n", i, e->index, e->press_frame, e->release_frame);
       if (e->release_frame == 0) { // pressing
         int t = current_frame - e->press_frame;
@@ -574,7 +579,7 @@ static void led_update_user(void) {
           }
         }
         if (current_frame > e->release_frame + 255 / 8 + DELAY * 7) {
-            e->index = 0;
+            INVALIDATE_EVENT(e);
         }
       }
     }
