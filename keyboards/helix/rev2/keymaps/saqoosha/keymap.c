@@ -546,6 +546,8 @@ void keyboard_post_init_user(void) {
 }
 
 
+#define DELAY (10)
+
 static void led_update_user(void) {
   memset(white, 0, sizeof(white));
   for (int i = 0; i < RGBLED_NUM; i++) {
@@ -553,21 +555,25 @@ static void led_update_user(void) {
     if (e->index > 0) {
       // uprintf("%d, %d, %lu, %lu\n", i, e->index, e->press_frame, e->release_frame);
       if (e->release_frame == 0) { // pressing
+        int t = current_frame - e->press_frame;
         for (int row = 0; row < 5; row++) {
           int i = LED_INDEX[row * 7 + e->col];
-          if (i >= 0) {
-            white[i] = 64;
+          int dist = abs(row - e->row);
+          if (i >= 0 && t - dist * DELAY > 0) {
+            white[i] = 255;
           }
         }
       } else { // released
-        int d = current_frame - e->release_frame;
+        int t = current_frame - e->release_frame;
         for (int row = 0; row < 5; row++) {
           int i = LED_INDEX[row * 7 + e->col];
+          int dist = abs(row - e->row);
+          int tt = t - dist * DELAY;
           if (i >= 0) {
-            white[i] = MAX(white[i], MAX(0, 64 - d / 2));
+            white[i] = MAX(white[i], MAX(0, MIN(255, 255 - tt * 8)));
           }
         }
-        if (current_frame > e->release_frame + 64 * 2) {
+        if (current_frame > e->release_frame + 255 / 8 + DELAY * 7) {
             e->index = 0;
         }
       }
