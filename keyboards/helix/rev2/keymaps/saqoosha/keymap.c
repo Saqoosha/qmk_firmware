@@ -606,7 +606,7 @@ void hsv2rgb(uint16_t hue, uint8_t sat, uint8_t val, uint8_t *r, uint8_t *g, uin
 
 
 #define DELAY (10)
-#define MAX_BRIGHTNESS (128)
+#define MAX_BRIGHTNESS (160)
 
 static void led_update_user(void) {
   memset(white, 0, sizeof(white));
