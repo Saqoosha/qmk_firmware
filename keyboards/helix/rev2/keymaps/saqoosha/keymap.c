@@ -335,7 +335,7 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
 }
 
 
-int LED_INDEX[] = {
+uint8_t LED_INDEX[] = {
    5,  4,  3,  2,  1,  0, -1,
    6,  7,  8,  9, 10, 11, -1,
   17, 16, 15, 14, 13, 12, -1,
@@ -343,7 +343,16 @@ int LED_INDEX[] = {
   31, 30, 29, 28, 27, 26, 25,
 };
 
+uint8_t ROW_INDEX[] = {
+  0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1,
+  2, 2, 2, 2, 2, 1,
+  3, 3, 3, 3, 3, 3, 3,
+  4, 4, 4, 4, 4, 4, 4,
+};
+
 uint8_t white[RGBLED_NUM];
+uint8_t rainbow[HELIX_ROWS][3];
 
 #define VALID_EVENT(x) (x->index >= 0)
 #define INVALIDATE_EVENT(x) (x->index = -1)
@@ -552,6 +561,50 @@ void keyboard_post_init_user(void) {
 }
 
 
+void hsv2rgb(uint16_t hue, uint8_t sat, uint8_t val, uint8_t *r, uint8_t *g, uint8_t *b) {
+  if (sat == 0) { // Acromatic color (gray). Hue doesn't mind.
+    *r = val;
+    *g = val;
+    *b = val;
+  } else {
+    uint8_t base = ((255 - sat) * val) >> 8;
+    uint8_t color = (val - base) * (hue % 60) / 60;
+    switch (hue / 60) {
+      case 0:
+        *r = val;
+        *g = base + color;
+        *b = base;
+        break;
+      case 1:
+        *r = val - color;
+        *g = val;
+        *b = base;
+        break;
+      case 2:
+        *r = base;
+        *g = val;
+        *b = base + color;
+        break;
+      case 3:
+        *r = base;
+        *g = val - color;
+        *b = val;
+        break;
+      case 4:
+        *r = base + color;
+        *g = base;
+        *b = val;
+        break;
+      case 5:
+        *r = val;
+        *g = base;
+        *b = val - color;
+        break;
+    }
+  }
+}
+
+
 #define DELAY (10)
 #define MAX_BRIGHTNESS (128)
 
@@ -602,11 +655,17 @@ static void led_update_user(void) {
     }
   }
 
+  if ((current_frame & 0xff) == 0) {
+    for (int row = 0; row < HELIX_ROWS; row++) {
+      hsv2rgb((current_frame / 500 + row * 25) % 360, 255, 64, &rainbow[row][0], &rainbow[row][1], &rainbow[row][2]);
+    }
+  }
+
   for (int i = 0; i < RGBLED_NUM; i++) {
-    uint8_t b = pgm_read_byte(&CIE1931_CURVE[white[i]]);
-    led[i].r = b;
-    led[i].g = b;
-    led[i].b = b;
+    uint8_t row = ROW_INDEX[i];
+    led[i].r = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][0], white[i])]);
+    led[i].g = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][1], white[i])]);
+    led[i].b = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][2], white[i])]);
   }
   rgblight_set();
 
