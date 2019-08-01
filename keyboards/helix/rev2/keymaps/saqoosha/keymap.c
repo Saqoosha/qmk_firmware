@@ -657,7 +657,7 @@ static void led_update_user(void) {
 
   if ((current_frame & 0xff) == 0) {
     for (int row = 0; row < HELIX_ROWS; row++) {
-      hsv2rgb((current_frame / 2000 + row * 25) % 360, 255, 64, &rainbow[row][0], &rainbow[row][1], &rainbow[row][2]);
+      hsv2rgb((current_frame / 10000 + row * 25) % 360, 255, 64, &rainbow[row][0], &rainbow[row][1], &rainbow[row][2]);
     }
   }
 
