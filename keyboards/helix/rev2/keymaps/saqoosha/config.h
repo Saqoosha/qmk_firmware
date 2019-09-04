@@ -23,6 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // place overrides here
 #define MASTER_RIGHT
 
+// #undef RGBLED_NUM
+// #define RGBLED_NUM 64
+// #define RGBLIGHT_SPLIT
+// #define RGBLED_SPLIT { 32, 32 }    // Number of LEDs
+
 // If you need more program area, try select and reduce rgblight modes to use.
 
 // Selection of RGBLIGHT MODE to use.
