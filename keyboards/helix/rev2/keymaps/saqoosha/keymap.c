@@ -1,25 +1,20 @@
+/* Copyright 2020 yushakobo
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include QMK_KEYBOARD_H
-#include "bootloader.h"
-#ifdef PROTOCOL_LUFA
-#include "lufa.h"
-#include "split_util.h"
-#endif
-#ifdef AUDIO_ENABLE
-  #include "audio.h"
-#endif
-#ifdef SSD1306OLED
-  #include "ssd1306.h"
-#endif
-#include "led_tables.h"
-
-extern keymap_config_t keymap_config;
-
-#ifdef RGBLIGHT_ENABLE
-//Following line allows macro to read current RGB settings
-extern rgblight_config_t rgblight_config;
-#endif
-
-extern uint8_t is_master;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -54,7 +49,6 @@ enum macro_keycodes {
 //Macros
 #define M_SAMPLE M(KC_SAMPLEMACRO)
 
-#if HELIX_ROWS == 5
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /* Qwerty
@@ -91,12 +85,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |Adjust| Esc  | Alt  | GUI  | EISU |Lower |Space |Space |Raise | KANA | Left | Down |  Up  |Right |
    * `-------------------------------------------------------------------------------------------------'
    */
-  [_COLEMAK] = LAYOUT( \
-      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL, \
-      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                      KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC, \
-      KC_LCTL, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                      KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT, \
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_LBRC, KC_RBRC, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT , \
-      ADJUST,  KC_ESC,  KC_LALT, KC_LGUI, EISU,    LOWER,   KC_SPC,  KC_SPC,  RAISE,   KANA,    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT \
+  [_COLEMAK] = LAYOUT(
+      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL,
+      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                      KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_LCTL, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                      KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_LBRC, KC_RBRC, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT ,
+      ADJUST,  KC_ESC,  KC_LALT, KC_LGUI, EISU,    LOWER,   KC_SPC,  KC_SPC,  RAISE,   KANA,    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
       ),
 
   /* Dvorak
@@ -133,12 +127,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |      |      |      |      |      |      |      |      |      |      | Mute | Vol- | Vol+ | Next |
    * `-------------------------------------------------------------------------------------------------'
    */
-  [_LOWER] = LAYOUT( \
-      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                   KC_CIRC, KC_AMPR, KC_ASTR,  KC_LPRN,     KC_RPRN,   _______, \
-      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                   KC_CIRC, KC_AMPR, KC_UP,    KC_LCBR,     KC_RCBR,   KC_PIPE, \
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     _______, KC_LEFT, KC_DOWN,  KC_RGHT,     KC_UNDS,   KC_PLUS, \
-      _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_HOME, _______,  KC_END,      _______,   _______, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC__MUTE, KC__VOLDOWN, KC__VOLUP, KC_MFFD \
+  [_LOWER] = LAYOUT(
+      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                   KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
+      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                   KC_CIRC, KC_AMPR, KC_UP,   KC_LCBR, KC_RCBR, KC_PIPE,
+      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_UNDS, KC_PLUS,
+      _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_HOME, _______, KC_END,  _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_VOLD, KC_VOLU, KC_MNXT
       ),
 
   /* Raise
@@ -154,12 +148,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |      |      |      |      |      |      |      |      |      |      | Mute | Vol- | Vol+ | Next |
    * `-------------------------------------------------------------------------------------------------'
    */
-  [_RAISE] = LAYOUT( \
-      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,     KC_9,        KC_0,      KC_BSPC, \
-      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,     KC_9,        KC_0,      KC_DEL, \
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     KC_SCLN, KC_MINS, KC_EQL,   KC_LBRC,     KC_RBRC,   KC_BSLS, \
-      _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, _______,  KC_PGDN,     KC_PGUP,   _______, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC__MUTE, KC__VOLDOWN, KC__VOLUP, KC_MFFD \
+  [_RAISE] = LAYOUT(
+      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
+      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL,
+      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     KC_SCLN, KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS,
+      _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, _______, KC_PGDN, KC_PGUP, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_VOLD, KC_VOLU, KC_MNXT
       ),
 
   /* Adjust (Lower + Raise)
@@ -177,130 +171,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [_ADJUST] =  LAYOUT( \
       KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12, \
-      _______, RESET,   RGBRST,  _______, _______, _______,                   _______, _______, _______, _______, _______, KC_DEL, \
+      _______, QK_BOOT, RGBRST,  _______, _______, _______,                   _______, _______, _______, _______, _______, KC_DEL, \
       _______, _______, _______, AU_ON,   AU_OFF,  AG_NORM,                   AG_SWAP, QWERTY,  _______, DVORAK,  _______, _______, \
       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, \
       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD \
       )
 };
-
-#elif HELIX_ROWS == 4
-
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-
-  /* Qwerty
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * | Tab  |   Q  |   W  |   E  |   R  |   T  |             |   Y  |   U  |   I  |   O  |   P  | Bksp |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Ctrl |   A  |   S  |   D  |   F  |   G  |             |   H  |   J  |   K  |   L  |   ;  |  '   |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Shift|   Z  |   X  |   C  |   V  |   B  |             |   N  |   M  |   ,  |   .  |   /  |Enter |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |Adjust| Esc  | Alt  | GUI  | EISU |Lower |Space |Space |Raise | KANA | Left | Down |  Up  |Right |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_QWERTY] = LAYOUT( \
-      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC, \
-      KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, \
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                      KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT , \
-      ADJUST,  KC_ESC,  KC_LALT, KC_LGUI, EISU,    LOWER,   KC_SPC,  KC_SPC,  RAISE,   KANA,    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT \
-      ),
-
-  /* Colemak
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * | Tab  |   Q  |   W  |   F  |   P  |   G  |             |   J  |   L  |   U  |   Y  |   ;  | Bksp |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Ctrl |   A  |   R  |   S  |   T  |   D  |             |   H  |   N  |   E  |   I  |   O  |  '   |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Shift|   Z  |   X  |   C  |   V  |   B  |             |   K  |   M  |   ,  |   .  |   /  |Enter |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |Adjust| Esc  | Alt  | GUI  | EISU |Lower |Space |Space |Raise | KANA | Left | Down |  Up  |Right |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_COLEMAK] = LAYOUT( \
-      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                      KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC, \
-      KC_LCTL, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                      KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT, \
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                      KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ENT , \
-      ADJUST,  KC_ESC,  KC_LALT, KC_LGUI, EISU,    LOWER,   KC_SPC,  KC_SPC,  RAISE,   KANA,    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT \
-      ),
-
-  /* Dvorak
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * | Tab  |   '  |   ,  |   .  |   P  |   Y  |             |   F  |   G  |   C  |   R  |   L  | Del  |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Ctrl |   A  |   O  |   E  |   U  |   I  |             |   D  |   H  |   T  |   N  |   S  |  /   |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * | Shift|   ;  |   Q  |   J  |   K  |   X  |             |   B  |   M  |   W  |   V  |   Z  |Enter |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |Adjust| Esc  | Alt  | GUI  | EISU |Lower |Space |Space |Raise | KANA | Left | Down |  Up  |Right |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_DVORAK] = LAYOUT( \
-      KC_TAB,  KC_QUOT, KC_COMM, KC_DOT,  KC_P,    KC_Y,                      KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_DEL, \
-      KC_LCTL, KC_A,    KC_O,    KC_E,    KC_U,    KC_I,                      KC_D,    KC_H,    KC_T,    KC_N,    KC_S,    KC_SLSH, \
-      KC_LSFT, KC_SCLN, KC_Q,    KC_J,    KC_K,    KC_X,                      KC_B,    KC_M,    KC_W,    KC_V,    KC_Z,    KC_ENT , \
-      ADJUST,  KC_ESC,  KC_LALT, KC_LGUI, EISU,    LOWER,   KC_SPC,  KC_SPC,  RAISE,   KANA,    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT \
-      ),
-
-  /* Lower
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * |   ~  |   !  |   @  |   #  |   $  |   %  |             |   ^  |   &  |   *  |   (  |   )  |      |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |  F1  |  F2  |  F3  |  F4  |  F5  |             |  F6  |   _  |   +  |   {  |   }  |  |   |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |  F7  |  F8  |  F9  |  F10 |  F11 |             |  F12 |      |      | Home | End  |      |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |      |      |      |      |      |      |      |      |      |      | Next | Vol- | Vol+ | Play |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_LOWER] = LAYOUT( \
-      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                   KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______, \
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     KC_F6,   KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, \
-      _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,                    KC_F12,  _______, _______, KC_HOME, KC_END,  _______, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY \
-      ),
-
-  /* Raise
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * |   `  |   1  |   2  |   3  |   4  |   5  |             |   6  |   7  |   8  |   9  |   0  | Del  |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |  F1  |  F2  |  F3  |  F4  |  F5  |             |  F6  |   -  |   =  |   [  |   ]  |  \   |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |  F7  |  F8  |  F9  |  F10 |  F11 |             |  F12 |      |      |PageDn|PageUp|      |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |      |      |      |      |      |      |      |      |      |      | Next | Vol- | Vol+ | Play |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_RAISE] = LAYOUT( \
-      KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL, \
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                     KC_F6,   KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS, \
-      _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,                    KC_F12,  _______, _______, KC_PGDN, KC_PGUP, _______, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD, KC_VOLU, KC_MPLY \
-      ),
-
-  /* Adjust (Lower + Raise)
-   * ,-----------------------------------------.             ,-----------------------------------------.
-   * |      | Reset|      |      |      |      |             |      |      |      |      |      |  Del |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |      |      |Aud on|Audoff| Mac  |             | Win  |Qwerty|Colemk|Dvorak|      |      |
-   * |------+------+------+------+------+------|             |------+------+------+------+------+------|
-   * |      |      |      |      |      |      |             |      |      |RGB ON| HUE+ | SAT+ | VAL+ |
-   * |------+------+------+------+------+------+-------------+------+------+------+------+------+------|
-   * |      |      |      |      |      |      |      |      |      |      | MODE | HUE- | SAT- | VAL- |
-   * `-------------------------------------------------------------------------------------------------'
-   */
-  [_ADJUST] =  LAYOUT( \
-      _______, RESET,   _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_DEL, \
-      _______, _______, _______, AU_ON,   AU_OFF,  AG_NORM,                   AG_SWAP, QWERTY,  COLEMAK, DVORAK,  _______, _______, \
-      _______, _______, _______, _______, _______, _______,                   _______, _______, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD \
-      )
-};
-
-#else
-#error "undefined keymaps"
-#endif
-
 
 #ifdef AUDIO_ENABLE
 
@@ -309,7 +185,6 @@ float tone_dvorak[][2]     = SONG(DVORAK_SOUND);
 float tone_colemak[][2]    = SONG(COLEMAK_SOUND);
 float tone_plover[][2]     = SONG(PLOVER_SOUND);
 float tone_plover_gb[][2]  = SONG(PLOVER_GOODBYE_SOUND);
-float music_scale[][2]     = SONG(MUSIC_SCALE_SOUND);
 #endif
 
 // define variables for reactive RGB
@@ -333,78 +208,7 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
   }
 }
 
-
-uint8_t LED_INDEX[] = {
-   5,  4,  3,  2,  1,  0, -1,
-   6,  7,  8,  9, 10, 11, -1,
-  17, 16, 15, 14, 13, 12, -1,
-  18, 19, 20, 21, 22, 23, 24,
-  31, 30, 29, 28, 27, 26, 25,
-};
-
-uint8_t ROW_INDEX[] = {
-  0, 0, 0, 0, 0, 0,
-  1, 1, 1, 1, 1, 1,
-  2, 2, 2, 2, 2, 2,
-  3, 3, 3, 3, 3, 3, 3,
-  4, 4, 4, 4, 4, 4, 4,
-};
-
-uint8_t white[RGBLED_NUM];
-uint8_t rainbow[HELIX_ROWS][3];
-
-#define VALID_EVENT(x) (x->index >= 0)
-#define INVALIDATE_EVENT(x) (x->index = -1)
-
-typedef struct {
-  uint8_t col;
-  uint8_t row;
-  int8_t index;
-  uint64_t press_frame;
-  uint64_t release_frame;
-} keyevent;
-
-keyevent events[RGBLED_NUM];
-uint8_t next_event = 0;
-
-int8_t get_running_event_index(int8_t led_index) {
-  for (int i = 0; i < RGBLED_NUM; i++) {
-    int j = (next_event - 1 - i + RGBLED_NUM) % RGBLED_NUM;
-    if (events[j].index == led_index) {
-      return j;
-    }
-  }
-  return -1;
-}
-
-uint64_t current_frame = 0;
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-// #ifdef CONSOLE_ENABLE
-//     uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
-// #endif
-  int col = record->event.key.col;
-  int row = record->event.key.row;
-  if ((is_master && row >= 5) || (!is_master && row < 5)) {
-    int index = LED_INDEX[(row % 5) * 7 + col];
-    int i = get_running_event_index(index);
-    if (record->event.pressed) {
-      if (i < 0) {
-        i = next_event;
-        next_event = (next_event + 1) % RGBLED_NUM;
-      }
-      events[i].col = col;
-      events[i].row = row % 5;
-      events[i].index = index;
-      events[i].press_frame = current_frame;
-      events[i].release_frame = 0;
-    } else {
-      if (i >= 0) {
-        events[i].release_frame = current_frame;
-      }
-    }
-  }
-
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
@@ -493,32 +297,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) {
           rgblight_mode(RGB_current_mode);
           rgblight_step();
-          RGB_current_mode = rgblight_config.mode;
+          RGB_current_mode = rgblight_get_mode();
         }
       #endif
       return false;
       break;
     case EISU:
       if (record->event.pressed) {
-        if(keymap_config.swap_lalt_lgui==false){
-          register_code(KC_LANG2);
-        }else{
+        if (is_mac_mode()) {
+          register_code(KC_LNG2);
+        } else {
           SEND_STRING(SS_LALT("`"));
         }
       } else {
-        unregister_code(KC_LANG2);
+        unregister_code(KC_LNG2);
       }
       return false;
       break;
     case KANA:
       if (record->event.pressed) {
-        if(keymap_config.swap_lalt_lgui==false){
-          register_code(KC_LANG1);
-        }else{
+        if (is_mac_mode()) {
+          register_code(KC_LNG1);
+        } else {
           SEND_STRING(SS_LALT("`"));
         }
       } else {
-        unregister_code(KC_LANG1);
+        unregister_code(KC_LNG1);
       }
       return false;
       break;
@@ -527,7 +331,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) {
           eeconfig_update_rgblight_default();
           rgblight_enable();
-          RGB_current_mode = rgblight_config.mode;
+          RGB_current_mode = rgblight_get_mode();
         }
       #endif
       break;
@@ -536,266 +340,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_init_user(void) {
-    #ifdef AUDIO_ENABLE
-        startup_user();
-    #endif
     #ifdef RGBLIGHT_ENABLE
-      RGB_current_mode = rgblight_config.mode;
-    #endif
-    //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
-    #ifdef SSD1306OLED
-        iota_gfx_init(!has_usb());   // turns on the display
+      RGB_current_mode = rgblight_get_mode();
     #endif
 }
-
-void keyboard_post_init_user(void) {
-  for (int i = 0; i < RGBLED_NUM; i++) {
-    led[i].r = 0;
-    led[i].g = 0;
-    led[i].b = 0;
-
-    events[i].index = -1;
-  }
-  rgblight_set();
-}
-
-
-void hsv2rgb(uint16_t hue, uint8_t sat, uint8_t val, uint8_t *r, uint8_t *g, uint8_t *b) {
-  if (sat == 0) { // Acromatic color (gray). Hue doesn't mind.
-    *r = val;
-    *g = val;
-    *b = val;
-  } else {
-    uint8_t base = ((255 - sat) * val) >> 8;
-    uint8_t color = (val - base) * (hue % 60) / 60;
-    switch (hue / 60) {
-      case 0:
-        *r = val;
-        *g = base + color;
-        *b = base;
-        break;
-      case 1:
-        *r = val - color;
-        *g = val;
-        *b = base;
-        break;
-      case 2:
-        *r = base;
-        *g = val;
-        *b = base + color;
-        break;
-      case 3:
-        *r = base;
-        *g = val - color;
-        *b = val;
-        break;
-      case 4:
-        *r = base + color;
-        *g = base;
-        *b = val;
-        break;
-      case 5:
-        *r = val;
-        *g = base;
-        *b = val - color;
-        break;
-    }
-  }
-}
-
-
-#define DELAY (10)
-#define MAX_BRIGHTNESS (160)
-
-static void led_update_user(void) {
-  memset(white, 0, sizeof(white));
-  for (int i = 0; i < RGBLED_NUM; i++) {
-    keyevent *e = &events[(next_event + 1 + i) % RGBLED_NUM];
-    if (VALID_EVENT(e)) {
-      // uprintf("%d, %d, %lu, %lu\n", i, e->index, e->press_frame, e->release_frame);
-      if (e->release_frame == 0) { // pressing
-        int t = current_frame - e->press_frame;
-        for (int row = 0; row < 5; row++) {
-          int i = LED_INDEX[row * 7 + e->col];
-          int dist = abs(row - e->row);
-          if (i >= 0 && t - dist * DELAY > 0) {
-            white[i] = MAX_BRIGHTNESS;
-          }
-        }
-        for (int col = 0; col < 7; col++) {
-          int i = LED_INDEX[e->row * 7 + col];
-          int dist = abs(col - e->col);
-          if (i >= 0 && t - dist * DELAY > 0) {
-            white[i] = MAX_BRIGHTNESS;
-          }
-        }
-      } else { // released
-        int t = current_frame - e->release_frame;
-        for (int row = 0; row < 5; row++) {
-          int i = LED_INDEX[row * 7 + e->col];
-          int dist = abs(row - e->row);
-          int tt = t - dist * DELAY;
-          if (i >= 0) {
-            white[i] = MAX(white[i], MAX(0, MIN(MAX_BRIGHTNESS, MAX_BRIGHTNESS - tt * 8)));
-          }
-        }
-        for (int col = 0; col < 7; col++) {
-          int i = LED_INDEX[e->row * 7 + col];
-          int dist = abs(col - e->col);
-          int tt = t - dist * DELAY;
-          if (i >= 0) {
-            white[i] = MAX(white[i], MAX(0, MIN(MAX_BRIGHTNESS, MAX_BRIGHTNESS - tt * 8)));
-          }
-        }
-        if (current_frame > e->release_frame + MAX_BRIGHTNESS / 8 + DELAY * 7) {
-            INVALIDATE_EVENT(e);
-        }
-      }
-    }
-  }
-
-  if ((current_frame & 0xff) == 0) {
-    for (int row = 0; row < HELIX_ROWS; row++) {
-      hsv2rgb((current_frame / 10000 + row * 25) % 360, 255, 64, &rainbow[row][0], &rainbow[row][1], &rainbow[row][2]);
-    }
-  }
-
-  for (int i = 0; i < RGBLED_NUM; i++) {
-    uint8_t row = ROW_INDEX[i];
-    led[i].r = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][0], white[i])]);
-    led[i].g = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][1], white[i])]);
-    led[i].b = pgm_read_byte(&CIE1931_CURVE[MAX(rainbow[row][2], white[i])]);
-  }
-  rgblight_set();
-
-  current_frame++;
-}
-
-
-#ifdef AUDIO_ENABLE
-
-void startup_user()
-{
-    _delay_ms(20); // gets rid of tick
-}
-
-void shutdown_user()
-{
-    _delay_ms(150);
-    stop_all_notes();
-}
-
-void music_on_user(void)
-{
-    music_scale_user();
-}
-
-void music_scale_user(void)
-{
-    PLAY_SONG(music_scale);
-}
-
-#endif
-
-
-//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
-#ifdef SSD1306OLED
-
-void matrix_scan_user(void) {
-    led_update_user();
-    iota_gfx_task();  // this is what updates the display continuously
-}
-
-void matrix_update(struct CharacterMatrix *dest,
-                          const struct CharacterMatrix *source) {
-  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-    memcpy(dest->display, source->display, sizeof(dest->display));
-    dest->dirty = true;
-  }
-}
-
-//assign the right code to your layers for OLED display
-#define L_BASE 0
-#define L_LOWER (1<<_LOWER)
-#define L_RAISE (1<<_RAISE)
-#define L_ADJUST (1<<_ADJUST)
-#define L_ADJUST_TRI (L_ADJUST|L_RAISE|L_LOWER)
-
-static void render_logo(struct CharacterMatrix *matrix) {
-
-  static char logo[]={
-    0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
-    0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
-    0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,
-    0};
-  matrix_write(matrix, logo);
-  //matrix_write_P(&matrix, PSTR(" Split keyboard kit"));
-}
-
-
-
-void render_status(struct CharacterMatrix *matrix) {
-
-  // Render to mode icon
-  static char logo[][2][3]={{{0x95,0x96,0},{0xb5,0xb6,0}},{{0x97,0x98,0},{0xb7,0xb8,0}}};
-  if(keymap_config.swap_lalt_lgui==false){
-    matrix_write(matrix, logo[0][0]);
-    matrix_write_P(matrix, PSTR("\n"));
-    matrix_write(matrix, logo[0][1]);
-  }else{
-    matrix_write(matrix, logo[1][0]);
-    matrix_write_P(matrix, PSTR("\n"));
-    matrix_write(matrix, logo[1][1]);
-  }
-
-  // Define layers here, Have not worked out how to have text displayed for each layer. Copy down the number you see and add a case for it below
-  char buf[40];
-  snprintf(buf,sizeof(buf), "Undef-%ld", layer_state);
-  matrix_write_P(matrix, PSTR("\nLayer: "));
-    switch (layer_state) {
-        case L_BASE:
-           matrix_write_P(matrix, PSTR("Default"));
-           break;
-        case L_RAISE:
-           matrix_write_P(matrix, PSTR("Raise"));
-           break;
-        case L_LOWER:
-           matrix_write_P(matrix, PSTR("Lower"));
-           break;
-        case L_ADJUST:
-        case L_ADJUST_TRI:
-           matrix_write_P(matrix, PSTR("Adjust"));
-           break;
-        default:
-           matrix_write(matrix, buf);
-    }
-
-  // Host Keyboard LED Status
-  char led[40];
-    snprintf(led, sizeof(led), "\n%s  %s  %s",
-            (host_keyboard_leds() & (1<<USB_LED_NUM_LOCK)) ? "NUMLOCK" : "       ",
-            (host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK)) ? "CAPS" : "    ",
-            (host_keyboard_leds() & (1<<USB_LED_SCROLL_LOCK)) ? "SCLK" : "    ");
-  matrix_write(matrix, led);
-}
-
-
-void iota_gfx_task_user(void) {
-  struct CharacterMatrix matrix;
-
-#if DEBUG_TO_SCREEN
-  if (debug_enable) {
-    return;
-  }
-#endif
-
-  matrix_clear(&matrix);
-  if(is_master){
-    render_status(&matrix);
-  }else{
-    render_logo(&matrix);
-  }
-  matrix_update(&display, &matrix);
-}
-
-#endif
